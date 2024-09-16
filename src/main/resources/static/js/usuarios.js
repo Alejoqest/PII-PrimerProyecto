@@ -21,7 +21,10 @@ async function cargarUsuarios() {
     for (const usuario of usuarios) {
 		
 		let botonEliminar = `
-		<a href="#" class="btn btn-danger btn-circle btn-sm">
+		<a 
+		href="#" 
+		onclick="eliminarUsuario(${usuario.id})"
+		class="btn btn-danger btn-circle btn-sm">
 			<i class="fas fa-trash"></i>
 		</a>
 		`;
@@ -41,4 +44,20 @@ async function cargarUsuarios() {
 	}
 	
 	document.querySelector('#usuarios tbody').outerHTML=listadoHTML;
+}
+
+async function eliminarUsuario(id) {
+	if (!confirm('¿Desea eliminar este usuario?')) {
+		return;
+	}
+	
+	const request = await fetch(`api/usuarios/${id}`, {
+		method : 'DELETE',
+		headers : {
+			'Accept' : 'application/json',
+			'Content-Type' : 'application/json'
+			}
+	})
+	
+	location.reload();
 }

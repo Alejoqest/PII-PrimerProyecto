@@ -1,16 +1,20 @@
 package com.cooweb.PrimerProyecto.controllers;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.cooweb.PrimerProyecto.dao.UsuarioDao;
 import com.cooweb.PrimerProyecto.models.Usuario;
+
+import de.mkammerer.argon2.Argon2;
+import de.mkammerer.argon2.Argon2Factory;
 
 
 @RestController
@@ -19,11 +23,28 @@ public class UsuarioController {
 	@Autowired
 	private UsuarioDao dao;
 	
-	//@GetMapping
-	@RequestMapping(value="api/usuarios")
+	@GetMapping("api/usuarios")
 	public List<Usuario> getUsuarios() {
 		return dao.getUsuarios();
 	}
+	
+	@PostMapping("api/usuarios")
+	public void registrarUsuario(@RequestBody Usuario usuario) {
+		
+		Argon2 argon2 = Argon2Factory.create(Argon2Factory.Argon2Types.ARGON2id);
+		
+		usuario.setPassword(
+				argon2.hash(1, 1024, 1, usuario.getPassword().getBytes())
+				);
+		
+		dao.registrar(usuario);
+	}
+	
+	@DeleteMapping("api/usuarios/{id}")
+	public void deleteUsuario(@PathVariable Long id) {
+		dao.eliminar(id);
+	}
+	
 	
 	/*@RequestMapping(value = "mensaje")
 	public String mensaje() {
